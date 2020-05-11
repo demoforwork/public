@@ -74,6 +74,10 @@ Note that granting larger scopes (ie. not readonly) will cause the program to fa
 ### Installing
 
 - Clone/pull this repo
+- Create the required directories (GitHub doesn't honor empty directories) under output
+    - output/CSV
+    - output/JSON/parents
+    - output/JSON/search 
 - Get the required go libraries
 - Build the code
 - Ensure your credentials directory isn't shared
