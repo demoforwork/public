@@ -1,4 +1,7 @@
-# Google Groups Explorer
+
+![Simulation](./Explorer%20for%20Google%20Groups.png)
+
+# Explorer for Google Groups
 
 Ever bumped into the Google [admin-managed Groups](https://support.google.com/a/answer/33343) parent [limits](https://support.google.com/a/answer/6099642?hl=en#membershiplimits)?
 
