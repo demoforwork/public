@@ -1,0 +1,22 @@
+application: gvizdashboard
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: true
+
+handlers:
+
+  
+- url: /static
+  static_dir: static
+  secure: always 
+  
+- url: /(.*\.(html|js|css|gif|png))
+  static_files: static/\1
+  upload: static/(.*\.(html|js|css|gif|png))
+  secure: always  
+  
+- url: /
+  static_files: static/index.html
+  upload: static/index.html
+  secure: always

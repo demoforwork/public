@@ -1,0 +1,203 @@
+<!--
+Copyright 2020 Ferris Argyle. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Based on view-source:https://visjs.github.io/vis-network/examples/network/other/performance.html -->
+<!doctype html>
+
+<head>
+    <title>Explorer for Google Groups</title>   
+
+    <!-- prevent favicon requests and 404: https://stackoverflow.com/questions/1321878/how-to-prevent-favicon-ico-requests -->
+    <link rel="icon" href="data:,">
+
+    <!-- needs to be first -->
+    <link rel="stylesheet" type="text/css" href="../static/groupcount.css">
+
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+
+    <script src="../static/vis-network.min.js"></script> <!-- Actually standalone, but need this to support exampleUtils -->
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="../static/jquery-ui.css">
+
+    <!-- must come after jQuery -->
+    <link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
+
+    <script type="text/javascript" src="../static/exampleUtil.js"></script>
+    <script src="../static/groupcount.js"></script>
+
+    <script language="javascript">
+
+      $(document).ready(function() {
+
+          loadCachedFiles();
+          $('#parents-files').val(""); // Select the option 
+          $('#parents-files').trigger('change'); // Notify any JS components that the value changed
+
+
+          $('select').select2({
+            placeholder: 'Select a cached response',
+            allowClear: false
+        });
+              
+        $('#parents-files').on("select2:select", function (e) { 
+
+           var data = $('#parents-files').select2('data');
+           var selection = data[0].text;
+           if (selection == 'None Selected') {
+             // Placeholder: Select2 doesn't fire if there's only one entry
+            } else {
+              $('#parents-progress-bar').removeClass('hidden');
+              $('#identity').val($('#parents-files').val());
+              loadSavedParents();
+           }
+         });
+
+        $('#search-files').on("select2:select", function (e) { 
+          console.log("75 select2:select");
+
+           var data = $('#search-files').select2('data');
+           var selection = data[0].text;
+           if (selection == 'None Selected') {
+             // Placeholder: Select2 doesn't fire if there's only one entry
+            } else {
+              $('#search-progress-bar').removeClass('hidden');
+              $('#prefix').val($('#search-files').val());
+              loadSavedList();
+           }
+         });
+
+      });
+
+      $( function() {
+        $( "#tabs" ).tabs();
+      } );
+
+      function invertTree() {
+        // simulated/generated data is upside down from real data so simpler to invert
+        // than to specify direction
+        var directionInput = document.getElementById("direction")
+        if (directionInput.value == "UD") {
+          directionInput.value = "DU";
+        } else {
+          directionInput.value = "UD";
+        }
+        draw();
+      }
+    </script>
+    
+</head>
+
+<body onload="simulate();">
+<h2>Explorer for Google Groups</h2>
+
+<br/>
+
+<div id="tabs">
+  <ul>
+    <li><a href="#tabs-1">Parent groups</a></li>
+    <li><a href="#tabs-2">Search groups</a></li>
+  </ul>
+
+  <div id="tabs-1">
+
+      <span>     
+        <fieldset class="control-group">
+            <label class="control-label" for=identity>Identity:</label>
+            <span class="controls"><input id="identity" class=input-large name=identity type=text style='width: 300px'></span>
+            <a href="#" class="tooltip">
+               <i class="fa fa-question-circle" alt="Identity tooltip"></i>
+               <span style='margin-top: +20px; margin-left:-70px;'>
+               <strong>Identity</strong><br />
+               User, service account, or group whose parents to graph
+               </span>
+            </a>
+            <span style="width:50%">               
+              <button type="button" class="action" onclick="loadParents()">Graph Parents</button>
+            </span>
+            <span style="width:50%">
+              <span class="right">
+                Cached
+                &nbsp; &nbsp;
+                 <select id='parents-files' name='parents-files' class="input-large select" style="width:200px">parents-fileselected</select> 
+              </span>
+            </span>
+        </fieldset> 
+        <br />
+        <fieldset class="control-group">
+            <label class="control-label" for=node-count>Node Count:</label>
+            <span class="controls"><input id="node-count" class=input-large name=node-count type=number value="25"></span>
+            <button class="right" onclick="simulate()">Simulate</button>
+        </fieldset> 
+    </span>
+
+
+    <br>
+    <div id='parents-progress-bar-div' class='progress-bar-div'>
+        <progress id="parents-progress-bar" max="100" class='hidden'/>
+    </div>
+
+    <div id="network-vis"></div>
+    
+
+    <p>
+        <span>
+          <!-- set type so doesn't interfere with input: https://stackoverflow.com/questions/2825856/html-button-to-not-submit-form-->
+          <button type="button" onclick="invertTree()">Invert tree</button>
+        </span>
+
+        <input type="hidden" id='direction' value="DU">
+    </p>
+  </div>
+
+  <div id="tabs-2">
+      <fieldset class="control-group">
+          <label class="control-label" for=prefix>Prefix:</label>
+          <span class="controls"><input id="prefix" class=input-large name=prefix type=text></span>
+          <a href="#" class="tooltip">
+             <i class="fa fa-question-circle" alt="Search tooltip"></i>
+             <span style='margin-top: +20px; margin-left:-70px;'>
+             <strong>Search</strong><br />
+             Group prefix for which to search
+             </span>
+          </a>   
+          <span style="width:50%">      
+             <button type="button" class="action" onclick="loadSearch()">Search Groups</button>
+          </span>
+          <span style="width:50%">
+              <span class="right">
+                Cached
+                &nbsp; &nbsp;
+                 <select id='search-files' name='search-files' class="input-large select" style="width:200px">search-fileselected</select> 
+            </span>
+      </fieldset> 
+      <br />
+      <div id='search-progress-bar-div' class='progress-bar-div'>
+        <progress id="search-progress-bar" max="100" class='hidden'/>
+      </div>
+      <fieldset class="control-group">
+        <div id="group-table" style='overflow: auto; height: 900px;';>
+        </div>
+      </fieldset> 
+  </div>
+
+</div>
+<div id=error style='color: red'></div>
+</body>
+</html>

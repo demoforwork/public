@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Get file</title>
+
+    <script src="https://apis.google.com/js/client.js?onload=OnLoadCallback"></script>
+
+    <script>
+        function OnLoadCallback() {
+            console.log('OnLoadCallback');
+            gapi.client.request({
+                'path': '/drive/v2/files/1w7u9ExPht7A6puBRYi6j3HsTUeHwmD4mUpmJ7gPdOys',
+                'method': 'GET',
+                callback: function ( theResponseJS, theResponseTXT ) {
+                    var myToken = gapi.auth.getToken();
+                    var myXHR   = new XMLHttpRequest();
+                    myXHR.open('GET', theResponseJS.downloadUrl, true );
+                    myXHR.setRequestHeader('Authorization', 'Bearer ' + myToken.access_token );
+                    myXHR.onreadystatechange = function( theProgressEvent ) {
+                        if (myXHR.readyState == 4) {
+            //          1=connection ok, 2=Request received, 3=running, 4=terminated
+                            if ( myXHR.status == 200 ) {
+            //              200=OK
+                                console.log( myXHR.response );
+                            }
+                        }
+                    }
+                    myXHR.send();
+                }
+            });
+            
+        }
+    </script>
+
+</head>
+
+<body> 
+    Download file
+
+</body>
+</html>     

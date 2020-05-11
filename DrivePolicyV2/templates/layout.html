@@ -1,0 +1,94 @@
+<!-- Nested templates: https://www.htmlgoodies.com/beyond/reference/nesting-templates-with-go-web-programming.html -->
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml'>
+  <head>
+    <meta name='viewport' content='width=device-width'/>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+    <title> {{ .Header }} </title>
+    <style type='text/css'>
+      body{
+        margin: 0 auto;
+        padding: 0;
+        min-width: 100%;
+        font-family: sans-serif;
+      }
+      table{
+        margin: 10px 50px 50px 0;
+      }
+      .hdr-bar{
+        background-color: #03A9F4; 
+        height: 45px; 
+        border-top: 12px solid #4285F4;
+      }
+      .hdr{
+        color: #fff; 
+        font-size: 1.7em; 
+        padding: 9px 0 0 15px
+      }
+      .content{
+        background-color: #fafafa; 
+        border-top: 1px solid #e3e3e3; 
+        border-left: 1px solid #e3e3e3; 
+        border-right: 2px solid #e3e3e3; 
+        border-bottom: 2px solid #e3e3e3; 
+        margin-top: 20px; 
+        padding: 10px
+      }
+      .content-hdr{
+        background-color: #03A9F4; 
+        color: #fff; 
+        padding: 5px; 
+        border-top: 0px; 
+        font-size: 1.3em; 
+        margin: 0 -2px 10px -1px;
+        text-align: center
+      }
+      .table-hdr{
+        border: 1px solid #e3e3e3; 
+        background-color: #fff; 
+        /* width: 300px; --> */
+        font-weight: bold; 
+        font-size: 0.92em
+      }
+      .table-cell{
+        border: 1px solid #e3e3e3; 
+        background-color: #fff; 
+      }
+      .footer{
+        text-transform: uppercase;
+        text-align: center;
+        height: 40px;
+        font-size: 14px;
+        font-style: italic;
+        margin-top: 20px; 
+      }
+    </style>
+  </head>
+  <body>
+    <div align=center class='hdr-bar'>
+      <div class='hdr'> {{ .Header }}
+        <span style='padding-right: 5px'></span>
+      </div> 
+    </div>
+
+    <div class='content'>
+      Please either:
+      <ul>
+        <li>remove the out-of-policy shares from the files</li>
+        <li>move the files to a parent folder for which these shares are permitted</li>
+      </ul>
+   </div>
+
+   {{ template "permissions" .NotificationMap }}
+
+   {{ template "policy" .FolderPolicyArr }}
+
+   {{ template "flags" .FlagArr }}
+
+   {{ template "logs" .LogArr }}
+    
+    <div class='footer'>
+      This utility doesn't apply to Team Drives.
+    </div>
+  </body>
+</html>

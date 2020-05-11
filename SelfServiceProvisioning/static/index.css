@@ -1,0 +1,31 @@
+td.appLabel { /* the label class is already used by bootstrap */
+  text-align: right;
+  width: 450px;
+  padding: 10px;
+  background-color:white;
+}
+td.values {
+  text-align: left;
+}
+div.errorMsg {
+  color: #ff0000;
+}
+div.errorMsgPwd {
+  color: #ff0000;
+}
+.description {
+    font-style:italic; 
+    vertical-align:top; 
+    padding-top:10px; 
+    padding-left:10px; 
+    text-align:center;
+}
+.highlight-color {
+    color:#0000ff; 
+}
+.success {
+    color: green;
+}
+.error {
+    color: red;
+}

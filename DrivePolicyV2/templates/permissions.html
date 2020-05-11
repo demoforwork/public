@@ -1,0 +1,69 @@
+<!-- Nested templates: https://www.htmlgoodies.com/beyond/reference/nesting-templates-with-go-web-programming.html -->
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+{{ define "permissions" }}
+    <div class='content'>
+      <div class='content-hdr'>Out of policy shares</div>
+
+		{{ if . }} 
+	      <table cellpadding='4' style='padding: 10px' width='100%'>
+	          <tr>
+	            <td class='table-hdr'>Item</td>
+	            <td class='table-hdr'>Type</td>
+	            <td class='table-hdr'>Permitted domains</td>
+	            <td class='table-hdr'>Owners</td>
+	            <td class='table-hdr'><strong>Out of Policy Share</strong></td>
+	          </tr>
+	        {{range $key, $element := . }}
+		        <tr>
+					<td class='table-cell'>
+						<a href='{{ $element.Url }}'>{{ $element.Name }}</a>
+					</td>
+					<td class='table-cell'>
+						{{ $element.ItemType }}
+					</td>
+					<td class='table-cell'>
+						{{ if $element.PermittedDomainMap }} 
+							{{ range $domain, $_ := $element.PermittedDomainMap }}
+								<div>
+			            			{{ $domain }}
+				            	</div>
+				            {{ end }}
+			            {{ end }}
+					</td>
+					<td class='table-cell'>
+						{{ if $element.OwnerMap }} 
+							{{ range $emailAddress, $displayName := $element.OwnerMap }}
+								<div>
+			            			<a href='https://mail.google.com/mail/?view=cm&fs=1&to={{ $emailAddress }}&su={{ $element.ItemType }} {{ $element.Name }} shared broadly&body={{ $element.Url }}%0A'>{{ $displayName }}</a>
+				            	</div>
+				            {{ end }}
+			            {{ end }}
+					</td>
+					<td class='table-cell'>
+						{{ if $element.PermissionMap }} 
+							{{ range $user, $permission := $element.PermissionMap }}
+								<div>			            									
+				            		{{ if eq $permission.Response "Success"}}
+				            			<del>{{ $user}}: {{ $permission.Role }}</del>
+			            			{{ else }}
+				            			{{ if eq $permission.Response "Failure"}}
+					            			{{ $user}}: {{ $permission.Role }}
+					            			<span> - <i><strong style="color:red;">Failed to remediate</strong></i></span>
+				            			{{ else }}
+				            				{{ $user}}: {{ $permission.Role }}
+				            			{{ end }}
+				            		{{ end }}
+				            	</div>
+				            {{ end }}
+			            {{ end }}
+					</td>
+				</tr>
+	        {{ end }}
+
+	      </table>
+	    {{ else }}
+	      <div>All files comply with permissions policy</div>
+	    {{ end }}
+    
+    </div>
+{{ end }}

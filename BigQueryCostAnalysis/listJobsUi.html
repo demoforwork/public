@@ -1,0 +1,157 @@
+<!-- 
+Copyright 2015 Google Inc. All rights reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/css/select2.min.css" rel="stylesheet" />
+<script src="//cdnjs.cloudflare.com/ajax/libs/select2/4.0.0-rc.2/js/select2.min.js"></script>
+
+<style>
+
+    select {
+      width: 150px; /* need to keep it narrow enough to fit within 300px sidebar */
+    }
+    .sidebar-padding {
+      padding: 10px;
+    }
+    .left-margin {
+      margin-left: 10px;
+    }
+    .success {
+      color: green;
+    }
+    .display-none {
+      display: none;
+    }
+    .hidden {
+      visibility: hidden;
+    }
+
+    <!-- http://www.menucool.com/tooltip/css-tooltip -->
+    <!-- take a look at http://cbracco.me/a-simple-css-tooltip/ if this one becomes a pain -->
+    a.tooltip {outline:none; }
+    a.tooltip strong {line-height:30px;}
+    a.tooltip:hover {text-decoration:none;} 
+    a.tooltip span {
+      z-index:10;display:none; padding:14px 20px;
+      width:200px;
+    }
+    a.tooltip:hover span{
+      display:inline; position:absolute; color:#111;
+      border:1px solid #DCA; background:#fffAF0;}
+    .callout {z-index:20;position:absolute;top:30px;border:0;left:-12px;}
+    
+    /*CSS3 extras*/
+    a.tooltip span
+    {
+      border-radius:4px;
+      box-shadow: 5px 5px 8px #CCC;
+    }
+</style>
+
+<script>
+    //add reference to the server side variables and language objects to the client so can use within the javascript
+    var CONFIG_OBJ = <?!= JSON.stringify(configObj) ?>;
+    
+    $(document).ready(function() {
+    
+      <? if (projectId) {?>
+        $('#submit').prop('disabled', false);
+      <? } else {?>
+       $('#submit').prop('disabled', true);
+      <? } ?>
+      
+      $("#project-id").on('input', function() {
+        if (this.value) {
+           $('#submit').prop('disabled', false);
+        }
+        else {
+           $('#submit').prop('disabled', true);
+        }
+      });
+      /*
+      $("#max-rows").on('input', function() {
+        if (this.value) {
+           $('#submit').prop('disabled', false);
+        }
+        else {
+           $('#submit').prop('disabled', true);
+        }
+      });*/
+    });
+
+    function submit() {
+      google.script.run.withSuccessHandler(submitSucceeded).withFailureHandler(submitFailed).listJobs(CONFIG_OBJ.sheetId, $('#project-id').val(), $('#max-rows').val()); // invoke the .gs script parent function
+    }
+
+    function submitFailed(e) {
+       google.script.host.close(); 
+    }
+
+    function submitSucceeded(message) {
+      google.script.host.close();
+    }
+    
+</script>
+
+<div>
+
+<div id=config-form class="left-margin sidebar-padding">  <!-- using <form> instead of <div> disables the ability to add/remove classes yourself -->
+      
+      <br>
+      <div><strong>Select project to analyze</strong></div>      
+      <p>
+      
+
+      <p>&nbsp;<p>
+      <div id='project-group' class="block form-group">
+         <label for="project-id">Project Id</label>
+         <a href="#" class="tooltip">
+           <i class="fa fa-question-circle" alt="Project tooltip"></i>
+           <span style='margin-top:-100px; margin-left:-100px;'>
+           <strong>Project</strong><br />
+           Enter the project id for the project whose queries you want to analyze
+           </span>
+         </a>
+         <br>
+         <input type="text" id="project-id" name="project-id" value=<?= projectId ?>><br>
+         <br>
+         <br>
+         <label for="max-rows">Maximum Rows</label>
+         <a href="#" class="tooltip">
+           <i class="fa fa-question-circle" alt="Project tooltip"></i>
+           <span style='margin-top:-100px; margin-left:-100px;'>
+           <strong>Maximum Rows</strong><br />
+           Enter the maximum number of rows (in multiples of 50) to return to prevent timing out
+           </span>
+         </a>
+         <br>
+         <input type="number" id="max-rows" name="max-rows" min="50" step="50" value="50"><br>
+      </div>
+  
+     
+     <br><br>
+        <div class="form-actions"> 
+            <button id=submit name=submit class="action" type=submit onclick=submit() disabled>Submit</button>   
+            <button id=cancel name=cancel type=button onclick=google.script.host.close()>Cancel</button>   
+        </div>
+
+</div>
+
+
+</div>

@@ -1,0 +1,273 @@
+<!doctype html>
+<html ng-app="SelfService"> <!--  ng-app="SelfService" -->
+
+  <head>
+
+    <!-- Angular.js - must be defined before script which references it-->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular.min.js"></script>
+    <!-- required for angular-ui/select -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.1/angular-sanitize.js"></script>
+    <!-- <link rel="stylesheet" href="bootstrap/bootstrap.css">  -->
+
+    <!-- AngularJS-native version of Select2 and Selectize: https://github.com/angular-ui/ui-select> -->
+    <script type="text/javascript" src="angularui/select.min.js"></script> 
+    <link rel="stylesheet" href="angularui/select.min.css"> 
+    <!-- Selectize theme: need this in addition to base css -->
+    <link rel="stylesheet" href="angularui/selectize.min.css">
+
+    <script src="app.js"></script>
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Google Cloud Endpoints API client library (generic) - must be defined after script containing onload function it references -->
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+        <script>
+    function test() {
+      console.log('selected');
+    }
+    </script>
+  </head>
+
+  <body ng-controller="MainCtrl" ng-cloak>
+
+
+          <form name="registration_form" ng-submit="update(user)">
+            <h3>Set Passwords and Add Accounts for {{user.userName}}</h3>
+            <div style="text-align:right">
+              <table style="width:100%;">
+                <tr>
+                  <td class="appLabel" style="padding:10px">Select the customer domain for which you would like to manage the account</td>
+                  <td class="values">
+                      <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: registration_form.domain.$invalid && registration_form.submitted}">  
+                                <div class="controls">
+                                    <!-- appears to be a bug which prevents clearing the select2: https://github.com/angular-ui/angular-ui-OLDREPO/issues/447 -->
+                                    <!-- select ui-select2 name="domain" ng-model="user.domain" data-placeholder="Pick a domain" ng-disabled="isInputDisabled" required>
+                                        <option ng-repeat="domain in domainArr"  value="{{domain}}">{{domain}}</option> 
+                                    </select> --> 
+                                      <ui-select ng-model="domain.selected" theme="selectize" ng-disabled="isInputDisabled"  style="width: 150px;">
+                                      <ui-select-match placeholder="Pick a domain">{{$select.selected.domain}}</ui-select-match>
+                                      <ui-select-choices repeat="domain in domainArr | filter: $select.search">
+                                        <div ng-bind-html="domain.domain | highlight: $select.search"></div>
+                                      </ui-select-choices>
+                                    </ui-select>
+                                    <span class="help-inline" ng-show="registration_form.domain.$invalid && registration_form.submitted">
+                                        <small 
+                                            ng-show="registration_form.domain.$error.required">
+                                            Required
+                                        </small>
+                                    </span>
+                                 </div>
+                             </div>  
+                        </div>
+                    </div>
+                    <!--
+                    <select name="domainSelect" id="domainSelect" onchange="domainChange(this)">
+                      <option value=""></option>
+                      <option ng-repeat="domain in domainArr"  value="{{domain}}">{{domain}}</option> 
+                    </select> -->
+                  </td>
+                  <td class="description highlight-color" id="domainDescription" rowspan="9">
+                  <div ng-show="domain.selected.domain == '[CUSTOMER_1_DOMAIN]'">
+                      <strong>Domain Description</strong>
+                      <hr>
+                      This is the primary domain from which the tool is running, which we're overloading as a provisioning sub-domain for testing....
+                  </div>
+                  <div ng-show="domain.selected.domain == '[CUSTOMER_2_DOMAIN]'">
+                      <strong>Domain Description</strong>
+                      <hr>
+                      This is the [CUSTOMER_2_DOMAIN] subdomain....
+                  </div>
+                  <div ng-show="domain.selected.domain == '[CUSTOMER_3_DOMAIN]'">
+                      <strong>Domain Description</strong>
+                      <hr>
+                      This is the [CUSTOMER_3_DOMAIN] subdomain....
+                  </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="appLabel">This for my...</td>
+                  <td class="values">
+                    <!-- ng-change="getUser()" -->
+                    <input type="radio" name="accountType" ng-model="accountType" value="main" ng-disabled="isInputDisabled" ng-change="getUser()">Main account</input><br/>
+                    <input type="radio" name="accountType" ng-model="accountType" value="demo" ng-disabled="isInputDisabled" ng-change="getUser()">Additional demo account</input><br/>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="appLabel">Resulting Subdomain Account User Name (cannot be changed)</td>
+                  <td class="values" id="usernameDisplay">{{domain.selected ? (accountType == "main" ? user.userName+"@"+domain.selected.domain : "d_"+user.userName+"@"+domain.selected.domain) : ""}}</td>
+                </tr>
+                <!--
+                <tr>
+                  <td class="appLabel">Existing Account: </td>
+                  <td class="values">
+                    <input type="checkbox" ng-model="existingAccount" ng-disabled="!domain.selected" ng-change="getUser()">
+                  </td>
+                </tr> -->
+                <tr ng-show="domain.selected && newUser">
+                  <td class="appLabel highlight-color"><h4>Create New User</h4></td>
+                  <td></td>
+                </tr>
+                <tr ng-show="domain.selected">
+                  <td class="appLabel">Subdomain Account First Name</td>
+                  <td class="values" id="">
+                    <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: (registration_form.givenName.$invalid && registration_form.submitted) || registration_form.givenName.$error.maxlength}">  
+                                <div class="controls">
+                                    <input type="text" name="givenName" ng-model="user.givenName" placeholder="Enter the first name" ng-minlength=3 ng-maxlength=20 ng-disabled="isInputDisabled || !domain.selected  || !newUser" required>
+                                    <span class="help-inline" ng-show="(registration_form.givenName.$invalid && registration_form.submitted) || registration_form.givenName.$error.maxlength">      
+                                        <small 
+                                            ng-show="registration_form.givenName.$error.required">
+                                            Required
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.givenName.$error.minlength">
+                                            Must be at least 3 characters
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.givenName.$error.maxlength">
+                                            Must be fewer than 20 characters
+                                        </small>
+                                    </span>
+                                 </div>                        
+                            </div>
+                        </div>
+                    </div>
+                  </td>
+                </tr>
+
+                <tr ng-show="domain.selected">
+                  <td class="appLabel">Subdomain Account Last Name</td>
+                  <td class="values" id="">
+                    <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: (registration_form.familyName.$invalid && registration_form.submitted) || registration_form.familyName.$error.maxlength}">  
+                                <div class="controls">
+                                    <input type="text" name="familyName" ng-model="user.familyName" placeholder="Enter the last name" ng-minlength=3 ng-maxlength=20 ng-disabled="isInputDisabled || !domain.selected  || !newUser" required>
+                                    <span class="help-inline" ng-show="(registration_form.familyName.$invalid && registration_form.submitted) || registration_form.familyName.$error.maxlength">      
+                                        <small 
+                                            ng-show="registration_form.familyName.$error.required">
+                                            Required
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.familyName.$error.minlength">
+                                            Must be at least 3 characters
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.familyName.$error.maxlength">
+                                            Must be fewer than 20 characters
+                                        </small>
+                                    </span>
+                                 </div>                        
+                            </div>
+                        </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr ng-show="domain.selected && !newUser">
+                  <td class="appLabel highlight-color"><h4>Set Password</h4></td>
+                  <td></td>
+                </tr>
+                <tr ng-show="domain.selected">
+                  <td class="appLabel">Subdomain Account Password (do <b>NOT</b> use your corporate password)</td>
+                  <td class="values">
+                    <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: (registration_form.password.$invalid && registration_form.submitted) || registration_form.password.$error.maxlength}">  
+                                <div class="controls">
+                                    <input type="password" name="password" ng-model="user.password" placeholder="Enter your password" ng-minlength=3 ng-maxlength=20 ng-disabled="isInputDisabled || !domain.selected" required>
+                                    <span class="help-inline" ng-show="(registration_form.password.$invalid && registration_form.submitted) || registration_form.password.$error.maxlength">      
+                                        <small 
+                                            ng-show="registration_form.password.$error.required">
+                                            Required
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.password.$error.minlength">
+                                            Must be at least 8 characters
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.password.$error.maxlength">
+                                            Must be fewer than 20 characters
+                                        </small>
+                                    </span>
+                                 </div>
+                            </div>   
+                        </div>
+                    </div>
+                  </td>
+                </tr>
+                <tr ng-show="domain.selected">
+                  <td class="appLabel">Repeat Subdomain Account Password</td>
+                  <td class="values">
+                    <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: (registration_form.password2.$invalid && registration_form.submitted) || registration_form.password2.$error.maxlength}">  
+                                <div class="controls">
+                                    <input type="password" name="password" ng-model="user.password2" placeholder="Confirm your password" ng-minlength=3 ng-maxlength=20 ng-disabled="isInputDisabled || !domain.selected" required>
+                                    <span class="help-inline" ng-show="(registration_form.password2.$invalid && registration_form.submitted) || registration_form.password2.$error.maxlength">      
+                                        <small 
+                                            ng-show="registration_form.password2.$error.required">
+                                            Required
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.password2.$error.minlength">
+                                            Must be at least 8 characters
+                                        </small>
+                                        <small 
+                                            ng-show="registration_form.password2.$error.maxlength">
+                                            Must be fewer than 20 characters
+                                        </small>
+                                    </span>
+                                 </div>
+                            </div>   
+                        </div>
+                    </div>
+                  </td>
+                </tr>
+                 <tr ng-show="newUser && domain.selected.orgs.length > 0">
+                  <td class="appLabel" style="padding:10px">Organizational unit</td>
+                  <td class="values">
+                      <div class="control-group">
+                        <div class="controls">
+                            <!-- http://stackoverflow.com/questions/15859011/how-to-set-twitter-bootstrap-class-error-based-on-angularjs-input-class-ng-inval -->
+                            <div class="control-group" ng-class="{error: registration_form.org.$invalid && registration_form.submitted}">  
+                                <div class="controls">
+                                    <!-- <p>Selected: {{org.selected}}</p> -->
+                                    <ui-select ng-model="org.selected" theme="selectize" ng-disabled="isInputDisabled || !domain.selected"  style="width: 150px;" >
+                                      <ui-select-match placeholder="Pick an org">{{$select.selected}}</ui-select-match>
+                                      <ui-select-choices repeat="org in domain.selected.orgs | filter: $select.search">
+                                        <div ng-bind-html="org | highlight: $select.search"></div>
+                                      </ui-select-choices>
+                                    </ui-select>
+                                    <span class="help-inline" ng-show="registration_form.org.$invalid && registration_form.submitted">
+                                        <small 
+                                            ng-show="registration_form.org.$error.required">
+                                            Required
+                                        </small>
+                                    </span>
+                                 </div>
+                             </div>  
+                        </div>
+                    </div>
+                  </td>
+                  <td style="font-style:italic; color:#0000ff; vertical-align:top; padding-top:10px; padding-left:10px; text-align:center;" id="domainDescription" rowspan="9"></td>
+                </tr>
+                <tr>
+                  <td class="appLabel"><input type="submit" value="{{submitButtonText}}" ng-disabled="isInputDisabled || submitDisabled" ng-click="submit()"></td>
+                  <td class="values"><input type="button" value="Cancel" ng-click="reset()"></td>
+                </tr>
+              </table>
+            </div>
+            <label class="{{msgClass}}">{{msg}}</label>
+            <input type="hidden" name="username" id="username" value="">
+        </form>
+
+    
+  </body>
+</html>

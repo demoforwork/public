@@ -1,0 +1,120 @@
+<!DOCTYPE html><!-- include so 3rd party code editor recognizes file-type on copy/paste -->
+
+<style>
+<!-- doesn't work for mail; need to embed in HTML -->
+</style>
+
+<p><h1>Settings</h1>
+<p><h3>Permitted sharing</h3>
+<table style='border: 1px solid black'>
+  <tr>
+     <th style='border: 1px solid black'>Folder</th>
+     <th style='border: 1px solid black'>Shared domain</th>
+  </tr>
+  <? for (var id in sharedFolderObj) { ?>
+     <? folder = DriveApp.getFolderById(id) ?>
+     <tr>
+        <td style='border: 1px solid black'>
+          <a href="<?= folder.getUrl() ?>"><?= folder.getName() ?></a>
+        </td>
+        <td style='border: 1px solid black'>
+          <?= sharedFolderObj[id] ?>
+        </td>
+     </tr>
+  <? } ?>
+
+</table>
+
+<p><h3>Permissions removal</h3>
+<? if (removeFolderPermissions) { ?>
+  <div>Remove folder permissions which don't match the permitted sharing</div>
+<? } ?>
+<? if (removeFilePermissions) { ?>
+  <div>Remove file permissions which don't match the permitted sharing</div>
+<? } ?>
+<? if (!removeFolderPermissions && !removeFilePermissions) { ?>
+  <div>Manual</div>
+<? } ?>
+
+<p><h3>Permissions Notification</h3>
+<? if (notifyFileIssues) { ?>
+  <div>Notify of file permissions as well as folder permissions which don't match the permitted sharing</div>
+<? } else { ?>  
+  <div>Notify only for folder permissions which don't match the permitted sharing</div>
+<? } ?>
+
+<p />&nbsp;
+<p />&nbsp;
+
+<p><h1>Permissions Issues</h1>
+<table style='border-collapse: collapse'>
+  <thead>
+  <tr>
+     <th rowspan=2 style='border: 1px solid black'>Asset</th>
+     <th rowspan=2 style='border: 1px solid black'>Type</th>
+     <th rowspan=2 style='border: 1px solid black'>Permitted domains</th>
+     <td colspan=3 style='border: 1px solid black'>Invalid User</td>
+  </tr>
+  <tr>
+     <th style='width:100px; border: 1px solid black'>Email</th>
+     <th style='width:100px; border: 1px solid black'>Permission</th>
+     <th style='width:100px; border: 1px solid black'>Removal Result</th>
+  </tr>
+  </thead>
+  <tbody>
+  <? for (var i in notificationObj) { ?>
+     <? var notificationObjLen = notificationObj[i].emailArr.length ?>
+     <tr>
+        <td style='border: 1px solid black'>
+          <a href="<?= notificationObj[i].url ?>"><?= notificationObj[i].name ?></a>
+        </td>
+        <td style='border: 1px solid black'>
+          <?= notificationObj[i].assetType ?>
+        </td>
+        <td style='border: 1px solid black'>
+          <?= notificationObj[i].permittedDomains ?>
+        </td>
+        <? if (notificationObjLen > 1) { ?>
+        <td colspan=3 style='border-collapse: collapse;'>
+         <table style='border-collapse: collapse'>
+         <? for (var j=0;j<notificationObjLen;j++) { ?>
+             <tr>
+                <td style='width:100px; border: 1px solid black'>
+                  <?= notificationObj[i].emailArr[j] ?>
+                </td>
+                <td style='width:100px; border: 1px solid black'>
+                  <?= notificationObj[i].permissionTypeArr[j] ?>
+                </td>
+                <td style='width:100px; border: 1px solid black'>
+                  <? if (notificationObj[i].resultArr[j]) { ?>
+                     <?= notificationObj[i].resultArr[j] ?>
+                  <? } else { ?> 
+                     N/A
+                  <? } ?>
+                </td>
+             </tr>
+          <? } ?>
+          </table>
+          </td>
+         <? } else { ?>
+                <td style='border: 1px solid black'>
+                  <?= notificationObj[i].emailArr[0] ?>
+                </td>
+                <td style='border: 1px solid black'>
+                  <?= notificationObj[i].permissionTypeArr[0] ?>
+                </td>
+                <td style='border: 1px solid black'>
+                  <? if (notificationObj[i].resultArr[0]) { ?>
+                     <?= notificationObj[i].resultArr[0] ?>
+                  <? } else { ?> 
+                     N/A
+                  <? } ?>
+                </td>
+         <? } ?>
+        
+      </tr>
+  <? } ?>
+  </tbody>
+</table>
+
+<p />* "VIEWER" permission includes commenters

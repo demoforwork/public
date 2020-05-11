@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title>
+	  Agosto Dashboard
+	</title>
+	
+	<!-- Google Visualization APIs -->
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+	<!-- jQuery: supports tabs -->
+	<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script> 
+	<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" type="text/css" /> 
+
+	
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript">
+	  google.load('visualization', '1.1', {packages: ['corechart','controls','charteditor','table']});
+	</script>
+
+   	<!-- Dashboard Script  -->
+	<script type="text/javascript" src="dashboard.js"></script>    
+
+   <script>
+		$(function() {
+		$( "#tabs" ).tabs();
+		});
+   </script>
+
+</head>
+<body>
+	<div id='dashboard'> <!-- required for javascript charting reference -->
+
+		<!-- <Optional: supports tabs -->
+		<div id="tabs">
+			<ul>
+				<li><a href='#tabs-1'>Criteria and Chart</a></li>
+				<li><a href='#tabs-2'>Table</a></li>
+			</ul>
+
+		<div id='tabs-1'>
+		<!-- Optional/> -->
+
+			<table>
+				<tr style='vertical-align: top'>
+					<td style='width: 300px; font-size: 0.9em;'>
+						<div id='control1'></div>
+						<div id='control2'></div>
+						<div id='control3'></div>
+					</td>
+					<td style='width: 700px'>
+						<div style='float: left;width: 700px' id='chart1'></div>    
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<div id='tabs-2'>
+			<div id='chart2'></div>
+		</div>
+
+		</div>
+	</div>
+
+	
+</body>
+</html>

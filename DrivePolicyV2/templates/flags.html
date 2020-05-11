@@ -1,0 +1,33 @@
+<!-- Nested templates: https://www.htmlgoodies.com/beyond/reference/nesting-templates-with-go-web-programming.html -->
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+{{ define "flags" }}
+    <div class='content'>
+      <div class='content-hdr'>Command Line Flags</div>
+
+      <table cellpadding='4' style='padding: 10px' width='100%'>
+          <tr>
+            <td class='table-hdr'>Flag</td>
+            <td class='table-hdr'>Value</td>
+          </tr>
+        {{range $index, $element := . }}
+	        <tr>
+		        <td class='table-cell'>{{ $element.Flag }}</td>
+		        <td class='table-cell'>
+		          	{{ if eq $element.Flag "rootId"}}
+						<a href='https://drive.google.com/corp/drive/folders/{{ $element.FlagVal }}'>
+						{{ $element.FlagVal }}</a>
+					{{ else }}
+						{{ if eq $element.Flag "policySpreadsheetId"}}
+							<a href='https://docs.google.com/spreadsheets/d/{{ $element.FlagVal }}/edit'>
+							{{ $element.FlagVal }}</a>
+						{{ else }}
+							{{ $element.FlagVal }}
+						{{ end }}
+					{{ end }}
+		        </td>
+	        </tr>
+        {{ end }}
+
+      </table>
+    </div>
+{{ end }}
