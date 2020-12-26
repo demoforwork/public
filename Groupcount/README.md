@@ -14,9 +14,7 @@ Use this utility to proactively check whether you're getting close to these limi
 
 The utility does not include group ownerships, which do count towards the quota; there isn't a way to do this other than scanning the entire groups tree.  
 
-Each edge joining multiple groups to a single parent (ie. diamond patterns) is counted; this is consistent with the Groups limits.
-
-Some permutations of group hierarchy may not be counted correctly.
+Each edge joining a child via multiple groups to a single parent (ie. diamond patterns) is counted; the actual Groups limits may be calculated differently for some children.
 
 Please test the utility to confirm that it counts groups as you'd expect.
 
