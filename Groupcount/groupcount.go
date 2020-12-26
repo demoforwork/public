@@ -327,7 +327,7 @@ func listCachedFiles(outputDir string, filePrefix string) []string {
         return fileArr
 }
 
-func serveTemplate(writer http.ResponseWriter, request *http.Request) {
+/*func serveTemplate(writer http.ResponseWriter, request *http.Request) {
 
         templatePath := filepath.Join(templateDir, templateFile)
 
@@ -348,7 +348,7 @@ func serveTemplate(writer http.ResponseWriter, request *http.Request) {
                 log.Println(err.Error())
                 http.Error(writer, http.StatusText(500), 500)
         }
-}
+}*/
 
 func listParents(writer http.ResponseWriter, request *http.Request) {
         var (
